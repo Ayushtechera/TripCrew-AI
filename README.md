@@ -21,5 +21,3 @@ uv venv --python 3.12
 uv pip install -r requirements.txt
 ```
 
-
-postgresql://ayushrewired:BkGX1HkHyiW0bTKpjAlDPNf5cerXu4YV@dpg-danbt12jnfac73847ph0-a.oregon-postgres.render.com/agentmemory_96vy
