@@ -1,11 +1,10 @@
-  
 # # res = tavily_search("Best Hotels in India")
 # # print(res)
 
 
-res = search_flights("Plan a 7 days Germany trip from India")
+# res = search_flights("Plan a 7 days Germany trip from India")
 
-print(res)
+# print(res)
 
 
 
@@ -34,3 +33,15 @@ print(res)
 
 # print("\nStatus Code:", response.status_code)
 # print("Response:", response.json())
+
+from backend import run_travel_agent
+
+user_input = input("Enter travel request: ")
+
+response = run_travel_agent(
+    user_input=user_input,
+    thread_id="test_user"
+)
+
+print("]n FIINAL RESPONSE: \n")
+print(response["answer"])
