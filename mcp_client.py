@@ -11,7 +11,7 @@ load_dotenv()
 
 
 TAVILY_API_KEY=os.getenv("TAVILY_API_KEY")
-AVIATION_STACK_API_KEY=os.getenv("AVIATIONSTACK_API_KEY")
+AVIATION_STACK_API_KEY=os.getenv("AVIATION_STACK_API_KEY")
 
 
 client = MultiServerMCPClient(
