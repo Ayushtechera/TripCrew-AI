@@ -69,6 +69,7 @@ class TravelState(TypedDict):
 # =========================
 # Flight Agent
 # =========================
+# This is normal approach
 # def flight_agent(state: TravelState):
 #     query = state["user_query"]
 #     # flight_data = search_flights(query)
