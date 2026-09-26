@@ -34,14 +34,26 @@
 # print("\nStatus Code:", response.status_code)
 # print("Response:", response.json())
 
-from backend import run_travel_agent
+# from backend import run_travel_agent
 
-user_input = input("Enter travel request: ")
+# user_input = input("Enter travel request: ")
 
-response = run_travel_agent(
-    user_input=user_input,
-    thread_id="test_user"
-)
+# response = run_travel_agent(
+#     user_input=user_input,
+#     thread_id="test_user"
+# )
 
-print("]n FIINAL RESPONSE: \n")
-print(response["answer"])
+# print("]n FIINAL RESPONSE: \n")
+# print(response["answer"])
+import os 
+from dotenv import load_dotenv
+load_dotenv()
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+
+import asyncio
+from mcp_client_test import get_all_tools,tavily_mcp_search
+
+if __name__ == "__main__":
+    query = "Latest news about AI"
+    print(bool(TAVILY_API_KEY))
+    asyncio.run(tavily_mcp_search(query))
