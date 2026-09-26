@@ -45,15 +45,22 @@
 
 # print("]n FIINAL RESPONSE: \n")
 # print(response["answer"])
-import os 
-from dotenv import load_dotenv
-load_dotenv()
-TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+
+# import os 
+# from dotenv import load_dotenv
+# load_dotenv()
+# TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 import asyncio
-from mcp_client_test import get_all_tools,tavily_mcp_search
+# from mcp_client_test import get_all_tools,tavily_mcp_search
+
+# if __name__ == "__main__":
+#     query = "Latest news about AI"
+#     print(bool(TAVILY_API_KEY))
+#     asyncio.run(tavily_mcp_search(query))
+
+
+from mcp_client import get_all_tools
 
 if __name__ == "__main__":
-    query = "Latest news about AI"
-    print(bool(TAVILY_API_KEY))
-    asyncio.run(tavily_mcp_search(query))
+    asyncio.run(get_all_tools())
