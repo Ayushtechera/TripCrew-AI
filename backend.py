@@ -278,6 +278,19 @@ User request:
         "llm_calls": llm_calls,
     }
 
+# =========================
+# Guardrail blocked response
+# =========================
+
+def guardrail_blocked_agent(state: TravelState):
+    reason = state.get("final_response") or state.get("guardrail_reason") or (
+        "This request was blocked by the travel input guardrail."
+    )
+    return {
+        "final_response": reason,
+        "messages": [AIMessage(content=reason)],
+    }
+
 
 
 # =========================
@@ -297,12 +310,13 @@ User request:
 #         "llm_calls": state.get("llm_calls", 0) + 1
 #     }
 
+
+# In this approach we have used the MCP Server 
 FLIGHT_AGENT_PROMPT = """
 You are travel flight expert
 
 User Query:
 {query}
-
 Airport Information:
 {airport_data}
 
@@ -423,9 +437,56 @@ def weather_agent(state:TravelState):
     }
 
 
+
+# =========================
+# Budget Agent - new specialist
+# =========================
+def budget_agent(state: TravelState):
+    prompt = f"""
+Analyze whether this trip is realistic for the user's budget.
+
+User Query:
+{state['user_query']}
+
+Trip Constraints:
+{state.get('trip_constraints', {})}
+
+Flight Results:
+{state.get('flight_results', '')}
+
+Hotel Results:
+{state.get('hotel_results', '')}
+
+Weather Results:
+{state.get('weather_results', '')}
+
+Return:
+1. Estimated cost categories
+2. Budget risk areas
+3. Money-saving suggestions
+4. Overall feasibility
+
+If exact live prices are unavailable, clearly label estimates as approximate.
+"""
+
+    response = llm.invoke(
+        [
+            SystemMessage(content="You are a practical travel budget analyst."),
+            HumanMessage(content=prompt),
+        ]
+    )
+
+    return {
+        "budget_results": response.content,
+        "messages": [AIMessage(content="Budget assessment generated.")],
+        "llm_calls": state.get("llm_calls", 0) + 1,
+    }
+
+
 # =========================
 # Itinerary Agent
 # =========================
+
 def itinerary_agent(state: TravelState):
     prompt = f"""
 Create a complete travel itinerary.

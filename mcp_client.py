@@ -35,7 +35,6 @@ client = MultiServerMCPClient(
                 "AVIATION_STACK_API_KEY":AVIATION_STACK_API_KEY
             }
         },
-
         "weather":{
             "transport":"stdio",
             "command":r"D:\MLProjects\Agentic Projects\TripCrew-AI\.venv\Scripts\python.exe",
