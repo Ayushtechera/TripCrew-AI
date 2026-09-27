@@ -353,7 +353,7 @@ def run_travel_agent(user_input: str, thread_id: str | None = None):
             "user_query": user_input,
             "flight_results": "",
             "hotel_results": "",
-            "weather_result":""
+            "weather_result":"",
             "itinerary": "",
             "llm_calls": 0
         },
