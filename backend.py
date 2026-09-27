@@ -27,7 +27,13 @@ from langchain_core.messages import (
 from langchain_groq import ChatGroq
 # from tools.tavily_tool import tavily_search
 # from tools.flight_tool import search_flights
-from mcp_client import tavily_mcp_search,aviation_mcp_call,extract_destination,forecast_mcp_search,weather_mcp_search
+from mcp_client import (
+    tavily_mcp_search,
+    aviation_mcp_call,
+    extract_destination,
+    forecast_mcp_search,
+    weather_mcp_search
+)
 
 def get_database_url():
     database_url = os.getenv("DATABASE_URL")
@@ -57,14 +63,31 @@ llm = ChatGroq(
 # =========================
 # State
 # =========================
-class TravelState(TypedDict):
+class TravelState(TypedDict, total=False):
     messages: Annotated[list[AnyMessage], operator.add]
     user_query: str
+
+    # Supervisor + guardrail state
+    guardrail_allowed: bool
+    guardrail_reason: str
+    selected_agents: list[str]
+    trip_constraints: dict[str, Any]
+    supervisor_reasoning: str
+
+    # Original specialist results
     flight_results: str
     hotel_results: str
-    itinerary: str
-    llm_calls: int
     weather_results: str
+    itinerary: str
+
+    # New budget + HITL state
+    budget_results: str
+    approval_request: str
+    approved: bool
+    human_feedback: str
+    final_response: str
+
+    llm_calls: int
 
 
 # =========================
