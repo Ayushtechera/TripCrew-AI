@@ -27,7 +27,7 @@ from langchain_core.messages import (
 from langchain_groq import ChatGroq
 # from tools.tavily_tool import tavily_search
 # from tools.flight_tool import search_flights
-from mcp_client import tavily_mcp_search,aviation_mcp_call
+from mcp_client import tavily_mcp_search,aviation_mcp_call,extract_destination,forecast_mcp_search,weather_mcp_search
 
 def get_database_url():
     database_url = os.getenv("DATABASE_URL")
@@ -64,6 +64,7 @@ class TravelState(TypedDict):
     hotel_results: str
     itinerary: str
     llm_calls: int
+    weather_results: str
 
 
 # =========================
@@ -179,6 +180,37 @@ def hotel_agent(state: TravelState):
 
 
 # =========================
+# Weather Agent
+# =========================
+def weather_agent(state:TravelState):
+    city = extract_destination(state["user_query"])
+
+    weather_data = asyncio.run(
+        weather_mcp_search(city)
+    )
+
+    forecast_data = asyncio.run(
+        forecast_mcp_search(city)
+    )
+
+    return{
+        "weather_results":f"""
+        Current Weather:
+        {weather_data}
+        
+        Forcast:
+        {forecast_data}
+
+        """,
+        "message":[
+            AIMessage(
+                content="Weather information fetched"
+            )
+        ]
+    }
+
+
+# =========================
 # Itinerary Agent
 # =========================
 def itinerary_agent(state: TravelState):
@@ -193,6 +225,9 @@ Flight Results:
 
 Hotel Results:
 {state['hotel_results']}
+
+Weather Result:
+{state['weather_results']}
 
 Make the itinerary practical, budget-aware, and easy to follow.
 """
@@ -228,14 +263,18 @@ Hotels:
 Itinerary:
 {state['itinerary']}
 
+Weather Result:
+{state['weather_results']}
+
 Format the final answer beautifully using these sections:
 
 1. Trip Summary
 2. Flight Information
 3. Hotel Suggestions
-4. Day-by-Day Itinerary
-5. Estimated Budget
-6. Final Recommendations
+4. Weather Information
+5. Day-by-Day Itinerary
+6. Estimated Budget
+7. Final Recommendations
 
 Important:
 - Be clear and practical.
@@ -263,6 +302,7 @@ graph.add_node("flight_agent", flight_agent)
 graph.add_node("hotel_agent", hotel_agent)
 graph.add_node("itinerary_agent", itinerary_agent)
 graph.add_node("final_agent", final_agent)
+
 
 graph.add_edge(START, "flight_agent")
 graph.add_edge("flight_agent", "hotel_agent")

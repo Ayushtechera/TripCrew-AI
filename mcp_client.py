@@ -9,11 +9,15 @@ os.environ["REQUEST_CA_BUNDLE"] = certifi.where()
 
 load_dotenv()
 
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 TAVILY_API_KEY=os.getenv("TAVILY_API_KEY")
 AVIATION_STACK_API_KEY=os.getenv("AVIATION_STACK_API_KEY")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
-
+llm = ChatGroq(
+    model="openai/gpt-oss-20b",
+    api_key=GROQ_API_KEY
+)
 client = MultiServerMCPClient(
     {
         "tavily":{
@@ -30,7 +34,19 @@ client = MultiServerMCPClient(
             "env":{
                 "AVIATION_STACK_API_KEY":AVIATION_STACK_API_KEY
             }
+        },
+
+        "weather":{
+            "transport":"stdio",
+            "command":r"D:\MLProjects\Agentic Projects\TripCrew-AI\.venv\Scripts\python.exe",
+            "args":[
+                r"D:\MLProjects\Agentic Projects\TripCrew-AI\custom_weather_mcp_server.py"
+            ],
+            "env":{
+                "OPENWEATHER_API_KEY":OPENWEATHER_API_KEY
+            }
         }
+
     }
 )
 
@@ -101,3 +117,70 @@ async def aviation_mcp_call(
     )
 
     return result
+
+# ==========================================
+# Weather MCP tools
+# ==========================================
+
+weather_tool = None
+forecast_tool = None
+
+
+async def initialize_weather_tools():
+    global weather_tool
+    global forecast_tool
+
+    if weather_tool is not None:
+        return
+
+    tools = await client.get_tools()
+
+    weather_tool = next(
+        t for t in tools
+        if t.name == "get_current_weather"
+    )
+
+    forecast_tool = next(
+        t for t in tools
+        if t.name == "get_forecast"
+    )
+
+
+async def weather_mcp_search(city: str):
+    await initialize_weather_tools()
+
+    result = await weather_tool.ainvoke(
+        {
+            "city": city
+        }
+    )
+    return result
+
+
+async def forecast_mcp_search(city: str):
+    await initialize_weather_tools()
+    result = await forecast_tool.ainvoke(
+        {
+            "city": city
+        }
+    )
+    return result
+
+
+# ==========================================
+# Destination extractor
+# ==========================================
+
+def extract_destination(query: str):
+    prompt = f"""
+    Extract only the destination city or country.
+
+    Query:
+    {query}
+
+    Return only destination name.
+    """
+
+    response = llm.invoke(prompt)
+
+    return response.content.strip()
