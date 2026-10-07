@@ -60,7 +60,7 @@ def get_forecast(city: str):
     data = response.json()
 
     forecast = []
-    
+
     # Return first 5 forecast entries
     for item in data["list"][:5]:
 
@@ -79,4 +79,6 @@ def get_forecast(city: str):
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(
+        transport="stdio",
+    )
